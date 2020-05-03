@@ -31,7 +31,8 @@ function PlayState:enter(params)
 
     -- give ball random starting velocity
     self.ball.dx = math.random(-200, 200)
-    self.ball.dy = math.random(-50, -60)
+    self.ball.dx = math.random(2) == 1 and math.random(-200, -75) or math.random(75, 200)
+    self.ball.dy = math.random(-65, -75)
 end
 
 function PlayState:update(dt)
