@@ -28,11 +28,15 @@ function PlayState:enter(params)
     self.highScores = params.highScores
     self.ball = params.ball
     self.level = params.level
+    self.powerupMeter = 0
 
     -- give ball random starting velocity
     self.ball.dx = math.random(-200, 200)
     self.ball.dx = math.random(2) == 1 and math.random(-200, -75) or math.random(75, 200)
     self.ball.dy = math.random(-65, -75)
+
+    self.powerup = {}
+    self.powerupActive = false
 end
 
 function PlayState:update(dt)
@@ -82,6 +86,10 @@ function PlayState:update(dt)
 
             -- add to score
             self.score = self.score + (brick.tier * 200 + brick.color * 25)
+
+            if not self.powerupActive then
+                self.powerupMeter = self.powerupMeter + brick.tier * 200 + brick.color * 25
+            end
 
             -- trigger the brick's hit function, which removes it from play
             brick:hit()
@@ -177,6 +185,31 @@ function PlayState:update(dt)
         brick:update(dt)
     end
 
+    -- Update the powerup
+    if self.powerupActive then
+        self.powerup:update(dt)
+
+        if self.powerup:collides(self.paddle) then
+            
+            gSounds['recover']:play()
+
+            -- Reset the powerup status
+            self.powerup = {}
+            self.powerupActive = false
+        end
+    end
+    
+    -- check if the scores hits a certain range
+    local powerupCeiling = 100
+    
+    if self.powerupMeter >= powerupCeiling then
+        self.powerup = Powerup(9)
+        self.powerup:spawn()
+        self.powerupActive = true
+        -- Re use the leftover points
+        self.powerupMeter = self.powerupMeter % powerupCeiling
+    end
+    
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
     end
@@ -198,6 +231,11 @@ function PlayState:render()
 
     renderScore(self.score)
     renderHealth(self.health)
+
+    -- Render if it is active
+    if self.powerupActive then
+        self.powerup:render()
+    end
 
     -- pause text, if paused
     if self.paused then
