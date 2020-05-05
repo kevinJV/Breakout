@@ -56,7 +56,6 @@ end
 function Powerup:update(dt)
     if self.forward then
         self.opacity = self.opacity + 100 * dt
-        print(self.opacity)
         -- If it reaches full opacity
         if self.opacity > 255 then
             self.opacity = 255
@@ -64,7 +63,6 @@ function Powerup:update(dt)
         end
     else
         self.opacity = self.opacity - 200 * dt
-        print(self.opacity)
         -- if it reaches a 48 opacity
         if self.opacity < 48 then
             self.opacity = 48

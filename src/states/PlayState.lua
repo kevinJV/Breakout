@@ -202,9 +202,16 @@ function PlayState:update(dt)
     -- check if the scores hits a certain range
     local powerupCeiling = 100
     
-    if self.powerupMeter >= powerupCeiling then
+    if self.powerupMeter >= powerupCeiling and self.powerupActive == false then
         self.powerup = Powerup(9)
         self.powerup:spawn()
+
+        --We need to check that the powerup is not on top the paddle
+        while self.powerup:collides(self.paddle) do
+            print("respawing powerup")
+            self.powerup:spawn()
+        end
+        
         self.powerupActive = true
         -- Re use the leftover points
         self.powerupMeter = self.powerupMeter % powerupCeiling
