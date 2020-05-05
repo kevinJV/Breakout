@@ -40,7 +40,7 @@ function love.load()
     math.randomseed(os.time())
 
     -- set the application title bar
-    love.window.setTitle('Breakout')
+    love.window.setTitle('Too many balls')
 
     -- initialize our nice-looking retro text fonts
     gFonts = {
@@ -74,7 +74,7 @@ function love.load()
     -- actual window no matter its dimensions
     push:setupScreen(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, WINDOW_WIDTH, WINDOW_HEIGHT, {
         vsync = true,
-        fullscreen = false,
+        fullscreen = true,
         resizable = true
     })
 

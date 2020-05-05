@@ -55,7 +55,7 @@ end
 function StartState:render()
     -- title
     love.graphics.setFont(gFonts['large'])
-    love.graphics.printf("BREAKOUT", 0, VIRTUAL_HEIGHT / 3,
+    love.graphics.printf("TOO MANY BALLS", 0, VIRTUAL_HEIGHT / 3,
         VIRTUAL_WIDTH, 'center')
     
     -- instructions
@@ -77,6 +77,9 @@ function StartState:render()
     end
     love.graphics.printf("HIGH SCORES", 0, VIRTUAL_HEIGHT / 2 + 90,
         VIRTUAL_WIDTH, 'center')
+
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.printf('Modified by Kevin JV', 5, VIRTUAL_HEIGHT - 25, VIRTUAL_WIDTH, 'left')
 
     -- reset the color
     love.graphics.setColor(255/255, 255/255, 255/255, 255/255)

@@ -36,6 +36,9 @@ function PlayState:enter(params)
 
     self.powerup = {}
     self.powerupActive = false
+
+    self.opacity = 128
+    self.forward = true --flip to know if opacity is going forward
 end
 
 function PlayState:update(dt)
@@ -185,7 +188,6 @@ function PlayState:update(dt)
                 gSounds['hurt']:play()
                 table.remove(self.balls, key)
             end
-            
         end
     end
         
@@ -235,6 +237,25 @@ function PlayState:update(dt)
         self.powerupMeter = self.powerupMeter % powerupCeiling
     end
     
+    -- opacity
+    if #self.balls >= 8 then
+        if self.forward then
+            self.opacity = self.opacity + 400 * dt
+            -- If it reaches full opacity
+            if self.opacity > 255 then
+                self.opacity = 255
+                self.forward = false
+            end
+        else
+            self.opacity = self.opacity - 400 * dt
+            -- if it reaches a 48 opacity
+            if self.opacity < 48 then
+                self.opacity = 48
+                self.forward = true
+            end
+        end
+    end
+
     --Quit
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
@@ -265,6 +286,25 @@ function PlayState:render()
     if self.powerupActive then
         self.powerup:render()
     end
+
+    --Render how many balls you got there
+
+    love.graphics.setFont(gFonts['medium'])
+    if #self.balls < 4 then
+        love.graphics.setColor(255/255, 255/255, 255/255, 40/255)
+        love.graphics.print('Balls:', VIRTUAL_WIDTH/2 - 18, 0)
+        love.graphics.print(tostring(#self.balls), VIRTUAL_WIDTH/2 + 24, 0)
+    elseif #self.balls < 8 then
+        love.graphics.setColor(255/255, 180/255, 180/255, 120/255)
+        love.graphics.print('A lot of balls:', VIRTUAL_WIDTH/2 - 72, 0)
+        love.graphics.print(tostring(#self.balls), VIRTUAL_WIDTH/2 + 44, 0)
+    else
+        love.graphics.setColor(255/55, 50/255, 80/255, self.opacity/255)
+        love.graphics.print('Too many balls!!!:', VIRTUAL_WIDTH/2 - 82, 0)
+        love.graphics.print(tostring(#self.balls), VIRTUAL_WIDTH/2 + 58, 0)
+    end
+    love.graphics.setColor(255/255, 255/255, 255/255, 255/255)
+
 
     -- pause text, if paused
     if self.paused then
