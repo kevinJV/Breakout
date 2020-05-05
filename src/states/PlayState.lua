@@ -31,7 +31,6 @@ function PlayState:enter(params)
     self.powerupMeter = 0
 
     -- give ball random starting velocity
-    self.balls[1].dx = math.random(-200, 200)
     self.balls[1].dx = math.random(2) == 1 and math.random(-200, -75) or math.random(75, 200)
     self.balls[1].dy = math.random(-65, -75)
 
@@ -55,6 +54,7 @@ function PlayState:update(dt)
 
     -- update positions based on velocity
     self.paddle:update(dt)
+    
     for key, ball in pairs(self.balls) do
         ball:update(dt)
         
@@ -161,24 +161,31 @@ function PlayState:update(dt)
         
         -- if ball goes below bounds, revert to serve state and decrease health
         if ball.y >= VIRTUAL_HEIGHT then
-            self.health = self.health - 1
-            gSounds['hurt']:play()
-            
-            if self.health == 0 then
-                gStateMachine:change('game-over', {
-                    score = self.score,
-                    highScores = self.highScores
-                })
+            --check which ball it is
+            if #self.balls == 1 then
+                self.health = self.health - 1
+                gSounds['hurt']:play()
+                
+                if self.health == 0 then
+                    gStateMachine:change('game-over', {
+                        score = self.score,
+                        highScores = self.highScores
+                    })
+                else
+                    gStateMachine:change('serve', {
+                        paddle = self.paddle,
+                        bricks = self.bricks,
+                        health = self.health,
+                        score = self.score,
+                        highScores = self.highScores,
+                        level = self.level
+                    })
+                end        
             else
-                gStateMachine:change('serve', {
-                    paddle = self.paddle,
-                    bricks = self.bricks,
-                    health = self.health,
-                    score = self.score,
-                    highScores = self.highScores,
-                    level = self.level
-                })
+                gSounds['hurt']:play()
+                table.remove(self.balls, key)
             end
+            
         end
     end
         
@@ -191,13 +198,22 @@ function PlayState:update(dt)
     if self.powerupActive then
         self.powerup:update(dt)
 
-        if self.powerup:collides(self.paddle) then
-            
+        if self.powerup:collides(self.paddle) then            
             gSounds['recover']:play()
 
             -- Reset the powerup status
             self.powerup = {}
             self.powerupActive = false
+
+            --Spawn another ball
+            print("spawning another baaaall")
+            local newBall = Ball()
+            newBall.skin = math.random(7)
+            newBall.x = self.paddle.x + (self.paddle.width / 2) - 4
+            newBall.y = self.paddle.y - 8
+            newBall.dx = math.random(2) == 1 and math.random(-200, -75) or math.random(75, 200)
+            newBall.dy = math.random(-65, -75)
+            table.insert(self.balls, newBall)
         end
     end
     
@@ -216,7 +232,6 @@ function PlayState:update(dt)
         end
         
         self.powerupActive = true
-        -- Re use the leftover points
         self.powerupMeter = self.powerupMeter % powerupCeiling
     end
     
